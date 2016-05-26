@@ -1,0 +1,6 @@
+- src: hoir.osx-r
+  version: master
+
+- src: hoir.osx-zsh
+  version: master
+

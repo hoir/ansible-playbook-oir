@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+_homebrew_installed() {
+    hash brew >/dev/null 2>&1 || return 1
+}
+
+_ansible_installed() {
+    brew --prefix ansible >/dev/null 2>&1 || \
+        return 1
+}
+
+_install_ansible() {
+    brew install ansible
+}
+
+_homebrew_installed || (echo "Homebrew not installed" && exit 1)
+
+_ansible_installed || _install_ansible
+
+ansible-galaxy install -r requirements.yml --force
+
+for pb in "$@"; do
+    [[ -f "${pb}.yml" ]] && ansible-playbook "${pb}.yml"
+done
+
+
