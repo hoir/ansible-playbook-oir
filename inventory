@@ -1,2 +1,3 @@
-localhost: ansible_connection=local become=yes
+local ansible_connection=local ansible_host=localhost
+local-sudo ansible_connection=local ansible_host=localhost ansible_become=yes
 

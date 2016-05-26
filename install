@@ -4,23 +4,40 @@ _homebrew_installed() {
     hash brew >/dev/null 2>&1 || return 1
 }
 
+_install_homebrew() {
+    echo "Homebrew not installed."
+    local install_yn
+    read -r -e -n 1 -p "Would you like to run the installer? [yN]" install_yn
+    if [[ "$install_yn" =~ ^[yY]$ ]]; then
+        local hb_install_uri="https://raw.githubusercontent.com/Homebrew/install/master/install"
+        local hb_install_script="$(mktemp)"
+        curl -fsSL -o "${hb_install_script}" "${hb_install_uri}"
+        ruby "${hb_install_script}"
+    else
+        exit 1
+    fi
+}
+
 _ansible_installed() {
     brew --prefix ansible >/dev/null 2>&1 || \
         return 1
 }
 
 _install_ansible() {
+    echo "Installing ansible via Homebrew..."
     brew install ansible
 }
 
-_homebrew_installed || (echo "Homebrew not installed" && exit 1)
+_homebrew_installed || _install_homebrew
 
 _ansible_installed || _install_ansible
 
 ansible-galaxy install -r requirements.yml --force
 
 for pb in "$@"; do
-    [[ -f "${pb}.yml" ]] && ansible-playbook "${pb}.yml"
+    extra_params="$([[ ${pb} = zsh ]] && echo '-K')"
+    [[ -f "${pb}.yml" ]] && ansible-playbook "${pb}.yml" ${extra_params:-}
+    unset extra_params
 done
 
 
