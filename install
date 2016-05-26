@@ -19,8 +19,7 @@ _install_homebrew() {
 }
 
 _ansible_installed() {
-    brew --prefix ansible >/dev/null 2>&1 || \
-        return 1
+    test -z "$(brew ls --versions ansible 2>/dev/null)"
 }
 
 _install_ansible() {
